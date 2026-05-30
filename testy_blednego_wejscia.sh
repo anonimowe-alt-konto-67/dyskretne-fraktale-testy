@@ -25,7 +25,7 @@ do
 
     if [ $? -ne 1 ]
     then
-        echo "Program powinien zwrócić 1, a zwrócił $?"
+        printf "${BRED}Program powinien zwrócić 1, a zwrócił $?.\n${NC}"
         break
     fi
 done
