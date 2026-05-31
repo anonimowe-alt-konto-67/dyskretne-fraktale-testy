@@ -3,6 +3,9 @@ then
     echo "Poprawne użycie: testy_poprawnosci.sh <ścieżka do pliku binarnego testowanego programu>"
 fi
 
+BRED='\033[1;31m'
+NC='\033[0m' # No Color
+
 for input_file in testy_poprawnosci_male/*.in
 do
     echo $input_file

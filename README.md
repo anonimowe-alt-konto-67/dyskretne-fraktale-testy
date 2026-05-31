@@ -1,1 +1,1 @@
-Panel z odpowiedziami na pytania, skargi i zależenia:
+Panel z odpowiedziami na pytania, skargi i zażalenia:
