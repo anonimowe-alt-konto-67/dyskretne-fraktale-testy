@@ -10,10 +10,12 @@ for filename in testy_blednego_wejscia/*
 do
     echo $filename
     $1 0 < $filename > /dev/null
+
+    exit_code=$?
     
-    if [ $? -ne 1 ]
+    if [ $exit_code -ne 1 ]
     then
-        printf "${BRED}Program powinien zwrócić 1, a zwrócił $?.\n${NC}"
+        printf "${BRED}Program powinien zwrócić 1, a zwrócił $exit_code.\n${NC}"
         break
     fi
 done
@@ -23,9 +25,11 @@ do
     echo "Testowanie błędnego n = $n."
     echo "" | $1 $n > /dev/null
 
-    if [ $? -ne 1 ]
+    exit_code=$?
+
+    if [ $exit_code -ne 1 ]
     then
-        printf "${BRED}Program powinien zwrócić 1, a zwrócił $?.\n${NC}"
+        printf "${BRED}Program powinien zwrócić 1, a zwrócił $exit_code.\n${NC}"
         break
     fi
 done
