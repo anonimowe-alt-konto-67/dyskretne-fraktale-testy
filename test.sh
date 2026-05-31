@@ -5,6 +5,8 @@ then
     exit 1
 fi
 
+BASEDIR="$(dirname "$0")"
+
 ulimit -v $((1<<17)) # 128 MB
 
 BRED='\033[1;31m'
@@ -22,7 +24,7 @@ check() {
     fi
 }
 
-for filename in "$(dirname $0)"/testy_blednego_wejscia/*
+for filename in "$BASEDIR"/testy_blednego_wejscia/*
 do
     describe "${filename##*/}"
     "$1" 0 < $filename > /dev/null
@@ -52,6 +54,10 @@ describe "Testowanie błędu I/O na wejściu (EISDIR)"
 "$1" 123 <.
 check 1
 
+describe "Testowanie błędu I/O na wyjściu (ENOSPC)"
+"$1" 3 < "$BASEDIR"/baseline/algae.in > /dev/full
+check 1
+
 describe "Testowanie wejścia większego niż dostępny RAM"
 yes 'meowmeowmeowmeow' | tr -d '\n' | "$1" 123 >/dev/null
 check 1
@@ -60,10 +66,10 @@ tmpfile="$(mktemp)"
 trap "rm $tmpfile" EXIT
 
 testdir=baseline
-for infile in "$(dirname $0)"/$testdir/*.in; do
+for infile in "$BASEDIR"/$testdir/*.in; do
     filename="${infile##*/}"
     testname="${filename%.in}"
-    for outfile in "$(dirname $0)"/$testdir/$testname.out.*; do
+    for outfile in "$BASEDIR"/$testdir/$testname.out.*; do
         n="${outfile##*.}"
         describe "$testdir/$filename n=$n"
         "$1" "$n" < $infile > $tmpfile
