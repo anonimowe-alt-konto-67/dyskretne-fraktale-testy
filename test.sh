@@ -100,18 +100,22 @@ check 1
 tmpfile="$(mktemp)"
 trap "rm $tmpfile" EXIT
 
+# run_correctness $n $infile $outfile
+run_correctness() {
+    "$SOLUTION" "$1" < $2 > $tmpfile
+    check 0 ""
+    check_output $tmpfile $3 ""
+    clear_status
+}
+
 testdir=baseline
 for infile in "$BASEDIR"/$testdir/*.in; do
     filename="${infile##*/}"
     testname="${filename%.in}"
     for outfile in "$BASEDIR"/$testdir/$testname.out.*; do
         n="${outfile##*.}"
-        describe "$testdir/$filename n=$n"
-        "$SOLUTION" "$n" < $infile > $tmpfile
-        check 0
-        printf "${BRED}"
-        cmp $tmpfile $outfile
-        printf "${NC}"
+        show_status "$testdir/$filename n=$n"
+        run_correctness "$n" "$infile" "$outfile"
     done
 done
 
@@ -129,12 +133,8 @@ do
     id="${without_id_text%%_*}"
 
     outfile="$BASEDIR"/$testdir/id_$id.out
-
     show_status "$testdir/$no_dir id=$id n=$n"
-    "$SOLUTION" "$n" < $infile > $tmpfile
-    check 0 ""
-    check_output $tmpfile $outfile ""
-    clear_status
+    run_correctness "$n" "$infile" "$outfile"
 done
 
 if (( num_failed )); then
