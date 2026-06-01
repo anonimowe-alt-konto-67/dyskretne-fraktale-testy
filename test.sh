@@ -1,13 +1,13 @@
 #!/bin/bash
 if [ $# -eq 0 ]
 then
-    echo "Poprawne użycie: testy_blednego_wejscia.sh <ścieżka do pliku binarnego testowanego programu>"
+    echo "Poprawne użycie: test.sh <ścieżka do pliku binarnego testowanego programu>"
     exit 1
 fi
 
 BASEDIR="$(dirname "$0")"
 
-ulimit -v $((1<<17)) # 128 MB
+ulimit -v $(( 128 * 1024 )) # 128 MB
 
 BRED='\033[1;31m'
 BWHITE='\033[1;37m'
@@ -18,9 +18,32 @@ describe() {
 }
 
 check() {
-    if [ $? -ne $1 ]
+    exit_code=$?
+    
+    if [ $exit_code -ne $1 ]
     then
-        printf "${BRED}Program powinien zwrócić $1, a zwrócił $?.\n${NC}"
+        if [ $# -eq 2 ]
+        then
+            printf "${BRED}$2\n${NC}"
+        fi
+
+        printf "${BRED}Program powinien zwrócić $1, a zwrócił $exit_code.\n${NC}"
+    fi
+}
+
+check_output() {
+    printf "${BRED}"
+    cmp $1 $2 > /dev/null
+    exit_code=$?
+    printf "${NC}"
+
+    if [ $exit_code -ne 0 ]
+    then
+        printf "${BRED}$3\n${NC}"
+        
+        printf "${BRED}"
+        cmp $1 $2
+        printf "${NC}"
     fi
 }
 
@@ -78,4 +101,24 @@ for infile in "$BASEDIR"/$testdir/*.in; do
         cmp $tmpfile $outfile
         printf "${NC}"
     done
+done
+
+
+testdir=testy_poprawnosci_male
+describe "Testowanie na małych losowych testach poprawności"
+
+for infile in "$BASEDIR"/$testdir/*.in
+do
+    no_dir="${infile##*/}"
+    base="${no_dir%.in}"
+
+    n="${base##*_}"
+    without_id_text="${base#id_}"
+    id="${without_id_text%%_*}"
+
+    outfile="$BASEDIR"/$testdir/id_$id.out
+
+    "$1" "$n" < $infile > $tmpfile
+    check 0 "$testdir/$no_dir id=$id n=$n"
+    check_output $tmpfile $outfile "$testdir/$no_dir id=$id n=$n"
 done
