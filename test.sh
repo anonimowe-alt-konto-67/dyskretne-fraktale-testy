@@ -102,23 +102,23 @@ trap "rm $tmpfile" EXIT
 
 # run_correctness $n $infile $outfile
 run_correctness() {
-    "$SOLUTION" "$1" < $2 > $tmpfile
+    timeout 5 "$SOLUTION" "$1" < $2 > $tmpfile
     check 0 ""
     check_output $tmpfile $3 ""
     clear_status
 }
 
-testdir=baseline
-for infile in "$BASEDIR"/$testdir/*.in; do
-    filename="${infile##*/}"
-    testname="${filename%.in}"
-    for outfile in "$BASEDIR"/$testdir/$testname.out.*; do
-        n="${outfile##*.}"
-        show_status "$testdir/$filename n=$n"
-        run_correctness "$n" "$infile" "$outfile"
+for testdir in baseline tricky; do
+    for infile in "$BASEDIR"/$testdir/*.in; do
+        filename="${infile##*/}"
+        testname="${filename%.in}"
+        for outfile in "$BASEDIR"/$testdir/$testname.out.*; do
+            n="${outfile##*.}"
+            show_status "$testdir/$filename n=$n"
+            run_correctness "$n" "$infile" "$outfile"
+        done
     done
 done
-
 
 testdir=testy_poprawnosci_male
 describe "Testowanie na małych losowych testach poprawności"
