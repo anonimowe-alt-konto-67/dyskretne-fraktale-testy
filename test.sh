@@ -13,6 +13,7 @@ ulimit -v $(( 128 * 1024 )) # 128 MB
 
 BRED='\033[1;31m'
 BWHITE='\033[1;37m'
+BGREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
 describe() {
@@ -138,5 +139,8 @@ do
 done
 
 if (( num_failed )); then
-    echo -e "${BRED}$num_failed failed checks${NC}"
+    echo -e "Testing summary: ${BRED}$num_failed failed checks${NC}"
+else
+    echo -e "Testing summary: ${BGREEN}all checks passed${NC}"
+    echo "Go write some tests of your own now."
 fi
